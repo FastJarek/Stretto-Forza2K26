@@ -11,7 +11,7 @@ HUD z wskaźnikami gazu i hamulca.
 
 ## Gotowy plik APK
 
-- [`release/DriftMasters2K26-v1.1.apk`](release/DriftMasters2K26-v1.1.apk) — podpisany, wersja 1.1 z realistyczną oprawą w stylu Assetto Corsa (`com.driftmasters2k26`, Android 7.0 / API 24+).
+- [`release/DriftMasters2K26-v1.1.apk`](release/DriftMasters2K26-v1.1.apk) — podpisany, wersja 1.1 z realistyczną oprawą w stylu Assetto Corsa (`com.driftmasters2k26`, Android 7.0 / API 24+). [Pobierz z GitHub Releases](https://github.com/FastJarek/Stretto-Forza2K26/releases/download/v1.1/DriftMasters2K26-v1.1.apk).
 - Po skopiowaniu na telefon zainstaluj plik, zezwalając na instalację z nieznanych źródeł.
 - Podpisano kluczem debugowym (`android/debug.keystore`); do Google Play wygeneruj własny klucz release.
 

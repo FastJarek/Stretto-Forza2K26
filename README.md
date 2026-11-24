@@ -12,7 +12,8 @@ Gra wyścigowo-driftingowa single player w stylu Assetto Corsa: 4 trasy treningo
 driftu w free roam, 6 aut (AE86/E36/S13 oraz E60/Miata/Gokart), szczegółowy setup,
 ocena driftu „Meyer”, tuning i ustawienia grafiki/dźwięku. Sterowanie:
 dotyk, żyroskop lub klawiatura + mysz. Gotowy podpisany plik:
-`drift-masters-2k26/release/DriftMasters2K26-v1.1.apk`.
+`drift-masters-2k26/release/DriftMasters2K26-v1.1.apk` ·
+[pobierz bezpośrednio z release v1.1](https://github.com/FastJarek/Stretto-Forza2K26/releases/download/v1.1/DriftMasters2K26-v1.1.apk).
 
 Szczegóły, sterowanie i instrukcja zbudowania APK:
 [`drift-masters-2k26/README.md`](drift-masters-2k26/README.md).
