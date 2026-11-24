@@ -466,6 +466,8 @@ function updateHUD(input) {
   $('hud-gear').textContent = (params.manual ? 'MAN ' : 'AUTO ') + (car.gear === -1 ? 'R' : car.gear);
   $('hud-rpm-fill').style.width = clamp(car.rpm / 8200 * 100, 0, 100) + '%';
   $('nitro-fill').style.width = car.nitro + '%';
+  $('pedal-gas').style.height = clamp(input.throttle * 100, 0, 100) + '%';
+  $('pedal-brake').style.height = clamp(input.brake * 100, 0, 100) + '%';
   const driftEl = $('drift-popup');
   const drifting = Math.abs(car.driftAngle) > 14 && car.speed > 8;
   driftEl.classList.toggle('show', drifting);

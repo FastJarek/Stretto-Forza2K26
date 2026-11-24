@@ -24,7 +24,9 @@ tar --exclude=node_modules --exclude=android/build --exclude='*.idsig' \
   --exclude=payload.json --exclude=result.json \
   -C "$SRC/drift-masters-2k26" -cf - . | tar -C "$TMP/drift-masters-2k26" -xf -
 
-if [ -f "$TMP/README.md" ]; then
+if [ -f "$TMP/README.md" ] && grep -q '^## Drift Masters 2K26$' "$TMP/README.md"; then
+  sed -i 's#Gotowy APK: `[^`]*`#Gotowy APK: `drift-masters-2k26/release/DriftMasters2K26-v1.1.apk`#g' "$TMP/README.md"
+elif [ -f "$TMP/README.md" ]; then
   cat >> "$TMP/README.md" <<'EOF'
 
 ## Drift Masters 2K26
@@ -32,7 +34,7 @@ if [ -f "$TMP/README.md" ]; then
 Gra wyścigowo-driftingowa 3D w stylu Assetto Corsa: Skipad, Bihoku, Tor Poznań,
 Suzuka, free roam, ocena Meyer, 6 aut, setup i tuning.
 Sterowanie: dotyk / żyroskop / klawiatura + mysz.
-Gotowy APK: `drift-masters-2k26/release/DriftMasters2K26-v1.0.apk`.
+Gotowy APK: `drift-masters-2k26/release/DriftMasters2K26-v1.1.apk`.
 [Szczegóły i instrukcja budowy](drift-masters-2k26/README.md).
 EOF
 else
@@ -46,7 +48,7 @@ git add -A
 if git diff --cached --quiet; then
   echo ">> Brak zmian do zatwierdzenia"
 else
-  git commit -q -m "Drift Masters 2K26: skipad/bihoku, Tor Poznań/Suzuka, free roam, setupy, żyroskop i APK"
+  git commit -q -m "Drift Masters 2K26 v1.1: realistyczna oprawa AC, tekstury torów, nowy HUD i APK"
 fi
 git push -q origin HEAD
 git remote set-url origin "https://github.com/${REPO}.git"
