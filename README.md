@@ -1,7 +1,8 @@
 # Gry 3D i 2D w przeglądarce
 
-Repozytorium zawiera sześć gier: **Drift Masters 2K26** (drift 3D na Androida
-z gotowym APK), **Operacja: Widmo** (strzelanka FPS 3D),
+Repozytorium zawiera siedem gier: **Drift Masters 2K26** (drift 3D na Androida
+z gotowym APK), **CS3 — Tactical Strike** (taktyczny FPS 3D z botami),
+**Operacja: Widmo** (strzelanka FPS 3D),
 **Samoloty 3D** (swobodny lot z fizyką), **Omijaj przeszkody 3D**,
 **Omijaj przeszkody 2D** oraz wersję pygame tej ostatniej.
 
@@ -18,6 +19,17 @@ Gotowy podpisany plik: `drift-masters-2k26/release/DriftMasters2K26-v1.2.apk` ·
 
 Szczegóły, sterowanie i instrukcja zbudowania APK:
 [`drift-masters-2k26/README.md`](drift-masters-2k26/README.md).
+
+## CS3 — Tactical Strike (taktyczny FPS 3D, Android + przeglądarka)
+
+Oryginalna strzelanka w klimacie CS2: 4v4 z botami, tryb bomby (strefy A/B),
+rundy, ekonomia i sklep, pięć rodzajów broni, odrzut, celowanie, minimapa,
+killerfeed i pełne sterowanie dotykowe oraz klawiaturą/myszą przez OTG/Bluetooth.
+Gotowy podpisany plik: `drift-masters-2k26/release/CS3-v1.0.apk`
+(kopia: `drift-masters-2k26/cs3/release/CS3-v1.0.apk`) ·
+[pobierz z release cs3-v1.0](https://github.com/FastJarek/Stretto-Forza2K26/releases/download/cs3-v1.0/CS3-v1.0.apk).
+
+Szczegóły, sterowanie i build: [`drift-masters-2k26/cs3/README.md`](drift-masters-2k26/cs3/README.md).
 
 ## Operacja: Widmo (strzelanka 3D)
 
@@ -133,6 +145,8 @@ Wersje gry, w której zielony samochód omija czerwone pojazdy:
 
 ## Pliki
 
+- `drift-masters-2k26/cs3/` – CS3 — Tactical Strike (gra + powłoka Androida + APK)
+- `drift-masters-2k26/release/CS3-v1.0.apk` – gotowy APK gry CS3
 - `strzelec3d.html`, `strzelec3d.mjs`, `logika-strzelca.mjs`, `testy-strzelca.mjs` – Operacja: Widmo
 - `samoloty.html`, `samoloty.mjs`, `fizyka-lotu.mjs`, `testy-lot.mjs` – Samoloty 3D
 - `gra3d.html`, `gra3d.mjs`, `logika3d.mjs` – Omijaj przeszkody 3D

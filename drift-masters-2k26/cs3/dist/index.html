@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#101418" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23101418'/%3E%3Ctext x='32' y='46' font-size='40' font-family='Arial' font-weight='bold' fill='%23e5b64a' text-anchor='middle'%3ECS%3C/text%3E%3C/svg%3E" />
+    <title>CS3 — Tactical Strike</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script>
+      (function () {
+        var box = null, shown = false;
+        function mount() {
+          if (!box) {
+            box = document.createElement('div');
+            box.id = 'fatal';
+            box.innerHTML = '<h2>Błąd uruchomienia CS3</h2><pre></pre>' +
+              '<p>Jeśli widzisz ten ekran, napis treść błędu autorowi gry.</p>';
+            box.querySelector('pre').textContent = window.__cs3ErrorText || '';
+          }
+          if (!box.parentNode) document.body.appendChild(box);
+        }
+        window.__cs3Fatal = function (msg) {
+          window.__cs3ErrorText = String(msg || 'Nieznany błąd');
+          if (box) box.querySelector('pre').textContent = window.__cs3ErrorText;
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
+          else mount();
+        };
+        window.addEventListener('error', function (e) {
+          window.__cs3Fatal((e.message || 'Błąd JS') + ' @ ' + (e.filename || '') + ':' + (e.lineno || ''));
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          window.__cs3Fatal('Promise: ' + ((e.reason && e.reason.message) || e.reason));
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game"></canvas>
+
+      <div id="hud" class="hidden">
+        <div id="topbar">
+          <div class="team-score t"><span class="tag">T</span><span id="scoreT">0</span></div>
+          <div class="round-info">
+            <div id="timer">1:55</div>
+            <div id="roundInfo">RUNDA 1 · PRZYGOTOWANIE</div>
+          </div>
+          <div class="team-score ct"><span id="scoreCT">0</span><span class="tag">CT</span></div>
+        </div>
+
+        <canvas id="minimap" width="220" height="220"></canvas>
+        <div id="killfeed"></div>
+        <div id="bomb-warning" class="hidden">● BOMBA ZAŁOŻONA ●</div>
+
+        <div id="crosshair">
+          <i class="ch-line ch-top"></i><i class="ch-line ch-bottom"></i>
+          <i class="ch-line ch-left"></i><i class="ch-line ch-right"></i>
+          <i class="ch-dot"></i>
+        </div>
+        <div id="hitmarker">✕</div>
+        <div id="damage-flash"></div>
+        <div id="flashbang"></div>
+
+        <div id="bottom-left">
+          <div class="stat-row"><span class="stat-icon hp">✚</span><span id="hp">100</span><span class="stat-label">HP</span></div>
+          <div class="stat-row"><span class="stat-icon armor">◆</span><span id="armor">0</span><span class="stat-label">PAN.</span></div>
+        </div>
+        <div id="bottom-right">
+          <div id="weapon-name">AK-R</div>
+          <div><span id="ammo">30</span><span id="reserve">/ 90</span></div>
+        </div>
+
+        <div id="progress" class="hidden">
+          <div id="progress-label">ZAKŁADANIE BOMBY</div>
+          <div class="progress-track"><div id="progress-bar"></div></div>
+        </div>
+        <div id="banner" class="hidden"></div>
+        <div id="toast" class="hidden"></div>
+
+        <div id="touch-controls" class="hidden">
+          <div id="stick-left" class="stick"><div id="stick-left-knob" class="knob"></div></div>
+          <div id="stick-right" class="stick"><div id="stick-right-knob" class="knob"></div></div>
+          <div class="touch-buttons">
+            <button id="btn-fire" class="tbtn fire">◉</button>
+            <button id="btn-ads" class="tbtn ads">⊕</button>
+            <button id="btn-jump" class="tbtn">↑</button>
+            <button id="btn-crouch" class="tbtn">↓</button>
+            <button id="btn-reload" class="tbtn small">R</button>
+            <button id="btn-weapon" class="tbtn small">⇄</button>
+            <button id="btn-use" class="tbtn small">E</button>
+            <button id="btn-walk" class="tbtn small">W</button>
+            <button id="btn-buy" class="tbtn small">$</button>
+            <button id="btn-nade" class="tbtn small">G</button>
+            <button id="btn-knife" class="tbtn small">🔪</button>
+            <button id="btn-pause" class="tbtn small pause">II</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="menu" class="overlay">
+        <div class="panel wide">
+          <div class="logo">CS<span>3</span></div>
+          <div class="logo-sub">TACTICAL STRIKE · MOBILE</div>
+          <p class="lead">Taktyczny FPS 4v4 z botami. Przejmij strefę, załóż bombę albo ją rozbrój.</p>
+
+          <div class="menu-grid">
+            <section>
+              <h3>DRUŻYNA</h3>
+              <div class="segmented" id="team-select">
+                <button data-team="CT" class="active">ANTYTERRORYŚCI</button>
+                <button data-team="T">TERRORYŚCI</button>
+              </div>
+              <h3>POZIOM BOTÓW</h3>
+              <div class="segmented" id="diff-select">
+                <button data-diff="0.65">ŁATWY</button>
+                <button data-diff="1" class="active">ŚREDNI</button>
+                <button data-diff="1.4">TRUDNY</button>
+              </div>
+              <h3>STEROWANIE</h3>
+              <div class="segmented" id="control-select">
+                <button data-control="auto" class="active">AUTO</button>
+                <button data-control="touch">DOTYK</button>
+                <button data-control="mouse">KLAWIATURA + MYSZ</button>
+              </div>
+            </section>
+            <section>
+              <h3>USTAWIENIA</h3>
+              <label class="slider-row">Czułość <input id="opt-sens" type="range" min="0.2" max="3" step="0.05" value="1" /><output id="out-sens">1.00</output></label>
+              <label class="slider-row">Dźwięk <input id="opt-vol" type="range" min="0" max="1" step="0.05" value="0.7" /><output id="out-vol">0.70</output></label>
+              <label class="slider-row">Grafika
+                <select id="opt-quality">
+                  <option value="low">Niska</option>
+                  <option value="medium">Średnia</option>
+                  <option value="high" selected>Wysoka</option>
+                </select>
+              </label>
+              <label class="check-row"><input id="opt-invert" type="checkbox" /> Odwróć oś Y</label>
+              <h3>SKRÓTY (PC)</h3>
+              <p class="keys">WASD ruch · Shift chód · Ctrl kucanie · Space skok · LPM ogień · PPM celowanie · R reload · 1–4 broń · E/F użyj · B sklep · Tab wyniki · Esc pauza</p>
+            </section>
+          </div>
+          <button id="start-btn" class="primary">ROZPOCZNIJ MECZ</button>
+          <p class="hint">Na Androidzie wybierz „DOTYK” albo podłącz mysz i klawiaturę przez OTG / Bluetooth i wybierz „KLAWIATURA + MYSZ”.</p>
+        </div>
+      </div>
+
+      <div id="pause" class="overlay hidden">
+        <div class="panel">
+          <h2>PAUZA</h2>
+          <p id="pause-info">Runda 1 · T 0 : 0 CT</p>
+          <button id="resume-btn" class="primary">WZNÓW GRĘ</button>
+          <button id="restart-btn">NOWY MECZ</button>
+          <button id="menu-btn">POWRÓT DO MENU</button>
+          <button id="fullscreen-btn">PEŁNY EKRAN</button>
+        </div>
+      </div>
+
+      <div id="buy" class="overlay hidden">
+        <div class="panel wide">
+          <h2>SKLEP · <span id="buy-money">$800</span></h2>
+          <div id="buy-grid" class="buy-grid"></div>
+          <p id="buy-msg" class="hint">&nbsp;</p>
+          <button id="buy-close" class="primary">ZAMKNIJ (B)</button>
+        </div>
+      </div>
+
+      <div id="scoreboard" class="hidden">
+        <table>
+          <thead><tr><th>GRACZ</th><th>ZAB.</th><th>ŚMIERCI</th><th>$</th></tr></thead>
+          <tbody id="scoreboard-body"></tbody>
+        </table>
+      </div>
+
+      <div id="matchover" class="overlay hidden">
+        <div class="panel">
+          <h2 id="matchover-title">ZWYCIĘSTWO</h2>
+          <p id="matchover-score">13 : 8</p>
+          <button id="again-btn" class="primary">ZAGRAJ PONOWNIE</button>
+          <button id="over-menu-btn">MENU</button>
+        </div>
+      </div>
+    </div>
+    <script src="game.js"></script>
+  </body>
+</html>

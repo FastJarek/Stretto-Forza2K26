@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Wywołuje natywne narzędzie Android SDK; na ARM używa qemu + x86_64 sysroot.
+set -e
+NAME="$(basename "$0")"
+HERE="$(cd "$(dirname "$0")" && pwd)"
+SDK="${ANDROID_SDK_ROOT:-$HOME/.android-sdk}"
+VER="${BUILD_TOOLS_VERSION:-35.0.0}"
+BIN="$SDK/build-tools/$VER/$NAME"
+if [ ! -f "$BIN" ]; then
+  echo "Nie znaleziono $BIN — ustaw ANDROID_SDK_ROOT i zainstaluj build-tools $VER" >&2
+  exit 1
+fi
+case "$NAME" in
+  d8|apksigner)
+    exec bash "$BIN" "$@"
+    ;;
+  *)
+    if [ "$(uname -m)" != "x86_64" ] && command -v qemu-x86_64-static >/dev/null 2>&1; then
+      exec qemu-x86_64-static -L "${QEMU_SYSROOT:-/usr/x86_64-linux-gnu}" "$BIN" "$@"
+    fi
+    exec "$BIN" "$@"
+    ;;
+esac
