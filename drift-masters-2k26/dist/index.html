@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#070912">
+<title>Drift Masters 2K26</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<canvas id="scene"></canvas>
+<div id="vignette" aria-hidden="true"></div>
+
+<div id="hud" class="hide">
+  <div class="hud-top">
+    <div class="hud-card" id="hud-track"><span class="hud-label">TRASA</span><strong id="hud-track-name">—</strong><span class="hud-mode" id="hud-mode"></span></div>
+    <div class="hud-card center" id="hud-time-card"><span class="hud-label">CZAS</span><strong id="hud-time">00:00.00</strong><small id="hud-best"></small></div>
+    <div class="hud-card right" id="hud-lap-card"><span class="hud-label">OKRĄŻENIE</span><strong id="hud-lap">1/1</strong><small id="hud-cp">CP 0/0</small></div>
+  </div>
+
+  <div id="drift-popup"><span id="drift-angle">0°</span><strong id="drift-score">+0</strong><small id="drift-grade">DRIFT</small></div>
+  <div id="combo-popup"></div>
+  <div id="center-message"></div>
+
+  <div class="hud-bottom">
+    <canvas id="minimap" width="180" height="180"></canvas>
+    <div class="speed-block">
+      <strong id="hud-speed">0</strong><span>km/h</span>
+      <div class="nitro-bar"><div id="nitro-fill"></div></div>
+    </div>
+    <div class="score-block">
+      <span class="hud-label">WYNIK</span><strong id="hud-score">0</strong>
+      <span class="hud-label" id="hud-gear">AUTO 1</span>
+      <div class="rpm-bar"><i id="hud-rpm-fill"></i></div>
+    </div>
+  </div>
+  <button id="pause-btn" class="icon-btn" aria-label="Pauza">II</button>
+</div>
+
+<div id="touch-controls" class="hide">
+  <div id="steer-pad"><div id="steer-knob"></div><span>STEROWANIE</span></div>
+  <div class="touch-buttons">
+    <button class="tbtn brake" data-control="brake">HAM</button>
+    <button class="tbtn handbrake" data-control="handbrake">RĘCZNY</button>
+    <button class="tbtn nitro" data-control="nitro">NOS</button>
+    <button class="tbtn gas" data-control="gas">GAZ</button>
+    <button class="tbtn clutch" data-control="clutch">SPRZĘGŁO</button>
+    <div class="touch-gears"><button class="tbtn" data-action="gear-down">E−</button><button class="tbtn" data-action="gear-up">Q+</button></div>
+  </div>
+</div>
+
+<div id="screens">
+  <!-- MENU -->
+  <section class="screen" id="screen-menu">
+    <div class="brand">
+      <div class="brand-mark">DRIFT<br>MASTERS</div>
+      <div class="brand-year">2K26</div>
+    </div>
+    <p class="tagline">Treningi · Zawody · Tuning · Bezgraniczny drift</p>
+    <div class="menu-buttons">
+      <button class="btn primary" data-action="goto-modes" data-mode="trening">TRENING · SKIDPAD</button>
+      <button class="btn" data-action="goto-modes" data-mode="wyścig">WYŚCIG · TOR POZNAŃ / SUZUKA</button>
+      <button class="btn" data-action="goto-modes" data-mode="drift">DRIFT · FREE ROAM</button>
+      <button class="btn" data-action="goto-garage">GARAŻ <span id="menu-credits">0 CR</span></button>
+      <button class="btn" data-action="goto-settings">USTAWIENIA</button>
+      <button class="btn" data-action="goto-help">JAK GRAĆ</button>
+    </div>
+    <div class="footer-note">Wersja 1.0 · Single player · dotyk / żyroskop / klawiatura + mysz</div>
+  </section>
+
+  <!-- TRACK SELECT -->
+  <section class="screen hide" id="screen-modes">
+    <header class="screen-head"><h2 id="modes-title">WYBIERZ TRASĘ · TRENING</h2><button class="btn small" data-action="goto-menu">← POWRÓT</button></header>
+    <div class="tabs">
+      <button class="tab active" data-tab="trening">TRENINGI</button>
+      <button class="tab" data-tab="wyścig">WYŚCIGI</button>
+      <button class="tab" data-tab="drift">DRIFT / FREE ROAM</button>
+    </div>
+    <div class="panel car-select">
+      <h3>SAMOCHÓD</h3>
+      <div id="car-options" class="chip-row"></div>
+      <p id="selected-car-info"></p>
+    </div>
+    <div id="track-list" class="track-list"></div>
+  </section>
+
+  <!-- GARAGE -->
+  <section class="screen hide" id="screen-garage">
+    <header class="screen-head"><h2>GARAŻ</h2><button class="btn small" data-action="goto-menu">← POWRÓT</button></header>
+    <div class="panel car-select">
+      <h3>WYBIERZ SAMOCHÓD</h3>
+      <div id="garage-cars" class="chip-row"></div>
+      <p id="garage-car-info"></p>
+    </div>
+    <div class="garage-layout">
+      <div class="panel">
+        <h3>WYGLĄD</h3>
+        <div id="color-swatches" class="swatches"></div>
+        <h3>FELGI</h3>
+        <div id="rim-options" class="chip-row"></div>
+        <label class="switch-row">Spoiler <input type="checkbox" id="tune-spoiler"></label>
+        <label class="switch-row">Neon podwozia <input type="checkbox" id="tune-neon"></label>
+      </div>
+      <div class="panel">
+        <h3>OSIĄGI <small id="garage-credits"></small></h3>
+        <div id="upgrade-list"></div>
+      </div>
+      <div class="panel stats-panel">
+        <h3>STATYSTYKI</h3>
+        <div id="stat-bars"></div>
+      </div>
+      <div class="panel setup-panel">
+        <h3>USTAWIENIA SAMOCHODU · SETUP</h3>
+        <div id="setup-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="screen hide" id="screen-settings">
+    <header class="screen-head"><h2>USTAWIENIA</h2><button class="btn small" data-action="settings-back">← POWRÓT</button></header>
+    <div class="settings-grid">
+      <div class="panel">
+        <h3>STEROWANIE</h3>
+        <div class="seg" id="control-mode">
+          <button data-value="touch" class="active">DOTYK</button>
+          <button data-value="gyro">ŻYROSKOP</button>
+          <button data-value="keyboard">KLAWIATURA + MYSZ</button>
+        </div>
+        <label class="slider-row">Czułość sterowania <output id="out-sensitivity"></output><input type="range" id="set-sensitivity" min="0.4" max="2" step="0.05"></label>
+        <label class="slider-row">Czułość żyroskopu <output id="out-gyro-sensitivity"></output><input type="range" id="set-gyro-sensitivity" min="0.3" max="2.5" step="0.05"></label>
+        <button class="btn small" data-action="calibrate-gyro">WYKALIBRUJ ŻYROSKOP</button>
+        <label class="switch-row">Sterowanie myszką <input type="checkbox" id="set-mouse-steer"></label>
+        <label class="switch-row">Odwróć sterowanie <input type="checkbox" id="set-invert"></label>
+        <label class="switch-row">Odwróć żyroskop <input type="checkbox" id="set-gyro-invert"></label>
+        <label class="slider-row">Dystans kamery <output id="out-camera-distance"></output><input type="range" id="set-camera-distance" min="4" max="14" step="0.5"></label>
+        <label class="slider-row">Wysokość kamery <output id="out-camera-height"></output><input type="range" id="set-camera-height" min="1.5" max="7" step="0.25"></label>
+        <label class="slider-row">Kąt widzenia (FOV) <output id="out-fov"></output><input type="range" id="set-fov" min="55" max="95" step="1"></label>
+        <div class="seg" id="camera-mode"><button data-value="chase" class="active">ZA AUTEM</button><button data-value="hood">KOKPIT</button><button data-value="bumper">ZDERZAK</button></div>
+      </div>
+      <div class="panel">
+        <h3>GRAFIKA</h3>
+        <div class="seg" id="graphics-quality">
+          <button data-value="low">NISKA</button><button data-value="medium">ŚREDNIA</button><button data-value="high" class="active">WYSOKA</button>
+        </div>
+        <label class="switch-row">Cienie <input type="checkbox" id="set-shadows"></label>
+        <label class="switch-row">Dym i poślizgi <input type="checkbox" id="set-particles"></label>
+        <label class="slider-row">Zasięg widzenia <output id="out-draw-distance"></output><input type="range" id="set-draw-distance" min="80" max="600" step="20"></label>
+        <label class="slider-row">Skala rozdzielczości <output id="out-resolution"></output><input type="range" id="set-resolution" min="0.6" max="1.5" step="0.05"></label>
+        <h3>DŹWIĘK</h3>
+        <label class="slider-row">Głośność główna <output id="out-master"></output><input type="range" id="set-master" min="0" max="1" step="0.05"></label>
+        <label class="slider-row">Silnik <output id="out-engine"></output><input type="range" id="set-engine" min="0" max="1" step="0.05"></label>
+        <label class="slider-row">Efekty <output id="out-effects"></output><input type="range" id="set-effects" min="0" max="1" step="0.05"></label>
+        <button class="btn small" data-action="reset-settings">PRZYWRÓĆ USTAWIENIA</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- HELP -->
+  <section class="screen hide" id="screen-help">
+    <header class="screen-head"><h2>JAK GRAĆ</h2><button class="btn small" data-action="goto-menu">← POWRÓT</button></header>
+    <div class="help-grid">
+      <div class="panel"><h3>DOTYK</h3>
+        <p><b>Pole po lewej:</b> przeciągnij palcem, aby skręcać (czułość w ustawieniach).</p>
+        <p><b>GAZ / HAM / RĘCZNY / NOS:</b> przyciski po prawej. Ręczny wprowadza auto w poślizg.</p>
+        <p><b>Pauza:</b> przycisk II w rogu ekranu.</p>
+      </div>
+      <div class="panel"><h3>KLAWIATURA + MYSZ</h3>
+        <p><b>W</b> gaz · <b>S</b> hamulec / bieg wsteczny · <b>A</b> lewo · <b>D</b> prawo</p>
+        <p><b>Spacja</b> hamulec ręczny · <b>Q / E</b> bieg + / − · <b>C</b> sprzęgło</p>
+        <p><b>Tab</b> widok kamery · <b>Esc</b> menu · <b>R</b> reset do linii startu</p>
+        <p><b>Mysz</b> działa w menu i ustawieniach; przytrzymaj LPM na obrazie, by skręcać.</p>
+      </div>
+      <div class="panel"><h3>ŻYROSKOP</h3>
+        <p>Wybierz <b>USTAWIENIA → STEROWANIE → ŻYROSKOP</b>, przechyl telefon, aby skręcać. Przed jazdą naciśnij <b>WYKALIBRUJ ŻYROSKOP</b>.</p>
+        <p>Gaz, hamulec i ręczny pozostają na przyciskach dotykowych. Czułość i odwrócenie ustawiasz w ustawieniach.</p>
+      </div>
+      <div class="panel"><h3>TRYBY I DRIFT</h3>
+        <p><b>TRENING:</b> Skipad, Bihoku i dwa dodatkowe tory do nauki.</p>
+        <p><b>WYŚCIG:</b> Tor Poznań i Suzuka — bramki w kolejności, okrążenia i medale.</p>
+        <p><b>DRIFT / FREE ROAM:</b> trzy otwarte areny bez bramek i limitu czasu. Kąt powyżej 14° daje punkty, powyżej 40° ocenę MEYER.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAUSE -->
+  <section class="screen hide overlay" id="screen-pause">
+    <div class="dialog">
+      <h2>PAUZA</h2>
+      <button class="btn primary" data-action="resume">WZNÓW JAZDĘ</button>
+      <button class="btn" data-action="restart">RESTART TRASY</button>
+      <button class="btn" data-action="pause-settings">USTAWIENIA</button>
+      <button class="btn hide" id="pause-finish" data-action="finish">ZAKOŃCZ SESJĘ I WYNIKI</button>
+      <button class="btn" data-action="quit">WYJŚĆ DO MENU</button>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen hide overlay" id="screen-results">
+    <div class="dialog wide">
+      <h2 id="result-title">KONIEC TRASY</h2>
+      <div id="result-medal" class="medal">🥉</div>
+      <div class="result-grid">
+        <div><span>CZAS</span><strong id="result-time">—</strong></div>
+        <div><span>WYNIK DRIFTU</span><strong id="result-score">—</strong></div>
+        <div><span>NAJLEPSZY</span><strong id="result-best">—</strong></div>
+        <div><span>NAGRADA</span><strong id="result-credits">—</strong></div>
+      </div>
+      <p id="result-note"></p>
+      <button class="btn primary" data-action="retry">JESZCZE RAZ</button>
+      <button class="btn" id="result-next" data-action="next-track">NASTĘPNA TRASA</button>
+      <button class="btn" data-action="quit">WYJŚĆ DO MENU</button>
+    </div>
+  </section>
+</div>
+
+<div id="toast"></div>
+<script src="game.js"></script>
+</body>
+</html>

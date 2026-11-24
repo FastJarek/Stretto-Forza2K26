@@ -1,0 +1,14 @@
+{
+  "name": "drift-masters-2k26",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Drift Masters 2K26 - 3D drift racing game for Android and desktop browsers",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.2"
+  }
+}
