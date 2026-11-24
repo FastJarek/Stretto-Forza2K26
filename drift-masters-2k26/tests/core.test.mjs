@@ -122,6 +122,42 @@ test('hamulec ręczny zwiększa kąt poślizgu', () => {
   assert.ok(drive(true) > drive(false) + 3);
 });
 
+test('model LFS: hamowanie silnikiem, przenoszenie masy i geometria Ackermanna', () => {
+  const p = carParams(DEFAULT_SAVE.tuning, DEFAULT_SETUP, 'ae86');
+  assert.ok(p.wheelRadius > 0.2);
+  assert.ok(p.trackWidth > 1);
+  assert.ok(p.engineBrake > 0);
+  assert.ok(p.diffStiffness > 0);
+  assert.ok(p.tireStiffnessFront > 0 && p.longStiffnessRear > 0);
+
+  const car = createCar(0, 0, 0);
+  for (let i = 0; i < 180; i++) stepCar(car, { throttle: 1 }, p, 1 / 60);
+  const beforeCoast = car.speed;
+  for (let i = 0; i < 60; i++) stepCar(car, { throttle: 0 }, p, 1 / 60);
+  assert.ok(car.speed < beforeCoast - 0.5, 'hamowanie silnikiem powinno zwalniać');
+  assert.ok(car.speed > beforeCoast - 8, 'hamowanie silnikiem nie może być zbyt mocne');
+
+  // Przyspieszenie obciąża tył, skręt w prawo obciąża lewe (zewnętrzne) koła.
+  const turn = createCar(0, 0, 0);
+  for (let i = 0; i < 120; i++) stepCar(turn, { throttle: 1 }, p, 1 / 60);
+  assert.ok(turn.wheelLoad[2] + turn.wheelLoad[3] > turn.wheelLoad[0] + turn.wheelLoad[1]);
+  for (let i = 0; i < 30; i++) stepCar(turn, { throttle: 0.7, steer: 1 }, p, 1 / 60);
+  assert.ok(turn.wheelLoad[0] > turn.wheelLoad[1], 'prawy łuk obciąża lewe koła');
+  assert.ok(Math.abs(turn.wheelSteer[0] - turn.wheelSteer[1]) > 0.001, 'Ackermann różni kąty kół');
+});
+
+test('model LFS: blokada dyferencjału zmienia rozdział momentu na kołach', () => {
+  const split = (diffLock) => {
+    const p = carParams(DEFAULT_SAVE.tuning, { ...DEFAULT_SETUP, diffLock }, 'ae86');
+    const car = createCar(0, 0, 0);
+    for (let i = 0; i < 60; i++) stepCar(car, { throttle: 1 }, p, 1 / 60);
+    car.wheelOmega[2] = car.wheelOmega[3] + 20;
+    stepCar(car, { throttle: 1 }, p, 1 / 240);
+    return Math.abs(car.wheelTorque[2] - car.wheelTorque[3]);
+  };
+  assert.ok(split(100) > split(0) + 100, 'zablokowany dyferencjał wyrównuje momenty');
+});
+
 test('punkty i ocena driftu (Meyer)', () => {
   assert.equal(driftPoints(40, 5, 1), 0);
   assert.equal(driftPoints(10, 35, 1), 0);

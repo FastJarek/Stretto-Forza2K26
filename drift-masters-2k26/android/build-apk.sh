@@ -12,7 +12,7 @@ AJAR="$SDK/platforms/$PLAT/android.jar"
 TOOLS="$ROOT/android/tools"
 BUILD="$ROOT/android/build"
 OUT="$ROOT/release"
-APK="$OUT/DriftMasters2K26-v1.1.apk"
+APK="$OUT/DriftMasters2K26-v1.2.apk"
 KEYSTORE="$ROOT/android/debug.keystore"
 
 if [ ! -f "$AJAR" ]; then

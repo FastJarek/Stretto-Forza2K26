@@ -4,14 +4,21 @@ Gra wyścigowa/driftowa 3D na Androida i do przeglądarki, w klimacie Assetto Co
 własna fizyka jazdy z poślizgiem bocznym, ocena driftu „Meyer”, trzy tryby gry,
 stawki aut, szczegółowy setup samochodu oraz trzy sposoby sterowania.
 
-Wersja 1.1 przestylizowana została na realistyczną oprawę Assetto Corsa:
+Wersja 1.2 przestylizowana została na realistyczną oprawę Assetto Corsa:
 dzienne niebo, oświetlenie słoneczne z cieniami, asfalt z teksturą, czerwono-białe
 krawężniki, drzewa/budynki przy torze, dopracowane nadwozia oraz minimalistyczny
 HUD z wskaźnikami gazu i hamulca.
 
+Silnik jazdy wzorowany jest na modelu Live For Speed: cztery niezależne koła
+z własną prędkością obrotową, poślizgiem wzdłużnym i poprzecznym, okręgiem
+przyczepności, spadkiem tarcia wraz z obciążeniem, geometrią Ackermanna,
+filtrowanym przenoszeniem masy, hamowaniem silnikiem, sprzęgłem oraz
+dyferencjałem z regulowaną blokadą. To autorska implementacja inspirowana LFS,
+nie kod ani dane z oryginalnej gry.
+
 ## Gotowy plik APK
 
-- [`release/DriftMasters2K26-v1.1.apk`](release/DriftMasters2K26-v1.1.apk) — podpisany, wersja 1.1 z realistyczną oprawą w stylu Assetto Corsa (`com.driftmasters2k26`, Android 7.0 / API 24+). [Pobierz z GitHub Releases](https://github.com/FastJarek/Stretto-Forza2K26/releases/download/v1.1/DriftMasters2K26-v1.1.apk).
+- [`release/DriftMasters2K26-v1.2.apk`](release/DriftMasters2K26-v1.2.apk) — podpisany, wersja 1.2 z fizyką kołową w stylu Live For Speed (`com.driftmasters2k26`, Android 7.0 / API 24+). [Pobierz z GitHub Releases](https://github.com/FastJarek/Stretto-Forza2K26/releases/download/v1.2/DriftMasters2K26-v1.2.apk).
 - Po skopiowaniu na telefon zainstaluj plik, zezwalając na instalację z nieznanych źródeł.
 - Podpisano kluczem debugowym (`android/debug.keystore`); do Google Play wygeneruj własny klucz release.
 
@@ -94,7 +101,7 @@ android/setup-sdk.sh             # pobiera Android SDK 35 + build-tools 35 (jeś
 ANDROID_SDK_ROOT=$HOME/.android-sdk android/build-apk.sh
 ```
 
-Wynik: `release/DriftMasters2K26-v1.1.apk`.
+Wynik: `release/DriftMasters2K26-v1.2.apk`.
 Na ARM build-tools Google są binarniami x86_64 — skrypt używa wtedy
 `qemu-x86_64-static` z sysrootem `/usr/x86_64-linux-gnu`.
 

@@ -540,15 +540,26 @@ export class GameWorld {
     if (!group) return;
     group.position.set(car.x, 0, car.z);
     group.rotation.y = car.yaw;
-    // Lekki przechył nadwozia w zakręcie
+    // Przechył na zakręcie i „nogowanie” przy przyspieszeniu/hamowaniu.
     const roll = clamp(car.driftAngle * 0.0035 + (steer || 0) * clamp(car.speed / 60, 0, 1) * 0.06, -0.09, 0.09);
+    const pitch = clamp((car.longAccel || 0) * 0.004, -0.05, 0.05);
     group.rotation.z = smooth(group.rotation.z, roll, 8, dt || 0.016);
+    group.rotation.x = smooth(group.rotation.x, pitch, 7, dt || 0.016);
     const wheels = group.userData.wheels || [];
-    const wheelRadius = wheels.length && wheels[0].radius ? wheels[0].radius : 0.42;
-    const spin = (car.speed || 0) * (dt || 0) / wheelRadius;
-    for (const w of wheels) {
+    const omegas = car.wheelOmega;
+    const steers = car.wheelSteer;
+    for (let i = 0; i < wheels.length; i++) {
+      const w = wheels[i];
+      // Koła z modelu fizyki pokazują prawdziwy poślizg i blokadę hamulca.
+      const spin = omegas && Number.isFinite(omegas[i])
+        ? omegas[i] * (dt || 0)
+        : (car.speed || 0) * (dt || 0) / (w.radius || 0.42);
       w.tire.rotation.x -= spin;
-      if (w.front) w.pivot.rotation.y = smooth(w.pivot.rotation.y, (steer || 0) * 0.42, 12, dt || 0.016);
+      if (w.front) {
+        const target = steers && Number.isFinite(steers[i])
+          ? -steers[i] * 0.75 : (steer || 0) * 0.42;
+        w.pivot.rotation.y = smooth(w.pivot.rotation.y, target, 12, dt || 0.016);
+      }
     }
   }
 

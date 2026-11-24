@@ -33,7 +33,7 @@ git add -A
 if git diff --cached --quiet; then
   echo ">> Brak zmian do zatwierdzenia"
 else
-  git commit -q -m "Drift Masters 2K26 v1.1: realistyczna oprawa AC, tekstury torów, nowy HUD i APK"
+  git commit -q -m "Drift Masters 2K26 v1.2: fizyka kołowa w stylu Live For Speed i nowy APK"
 fi
 git push -q origin HEAD
 git remote set-url origin "https://github.com/${REPO}.git"
