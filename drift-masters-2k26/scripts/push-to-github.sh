@@ -24,22 +24,7 @@ tar --exclude=node_modules --exclude=android/build --exclude='*.idsig' \
   --exclude=payload.json --exclude=result.json \
   -C "$SRC/drift-masters-2k26" -cf - . | tar -C "$TMP/drift-masters-2k26" -xf -
 
-if [ -f "$TMP/README.md" ] && grep -q '^## Drift Masters 2K26$' "$TMP/README.md"; then
-  sed -i 's#Gotowy APK: `[^`]*`#Gotowy APK: `drift-masters-2k26/release/DriftMasters2K26-v1.1.apk`#g' "$TMP/README.md"
-elif [ -f "$TMP/README.md" ]; then
-  cat >> "$TMP/README.md" <<'EOF'
-
-## Drift Masters 2K26
-
-Gra wyścigowo-driftingowa 3D w stylu Assetto Corsa: Skipad, Bihoku, Tor Poznań,
-Suzuka, free roam, ocena Meyer, 6 aut, setup i tuning.
-Sterowanie: dotyk / żyroskop / klawiatura + mysz.
-Gotowy APK: `drift-masters-2k26/release/DriftMasters2K26-v1.1.apk`.
-[Szczegóły i instrukcja budowy](drift-masters-2k26/README.md).
-EOF
-else
-  cp "$SRC/README.md" "$TMP/README.md"
-fi
+cp "$SRC/README.md" "$TMP/README.md"
 
 cd "$TMP"
 git config user.name "OpenCode"
